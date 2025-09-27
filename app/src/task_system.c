@@ -173,7 +173,6 @@ void task_system_statechart(void)
 			if ((true == p_task_system_dta->flag) && (EV_SYS_LOOP_DET == p_task_system_dta->event))
 			{
 				p_task_system_dta->flag = false;
-				put_event_task_actuator(EV_LED_XX_ON, ID_LED_A);
 				p_task_system_dta->state = ST_SYS_ACTIVE_01;
 			}
 
@@ -181,32 +180,77 @@ void task_system_statechart(void)
 
 		case ST_SYS_ACTIVE_01:
 
-			if ((true == p_task_system_dta->flag) && (EV_SYS_IDLE == p_task_system_dta->event))
+			if ((true == p_task_system_dta->flag) && (EV_SYS_MANUAL_BTN == p_task_system_dta->event))
 			{
 				p_task_system_dta->flag = false;
-				put_event_task_actuator(EV_LED_XX_OFF, ID_LED_A);
-				p_task_system_dta->state = ST_SYS_IDLE;
+				p_task_system_dta->tick = DEL_SYS_MAX;
+				put_event_task_actuator(EV_LED_XX_ON, ID_LED_A);
+				p_task_system_dta->state = ST_SYS_ACTIVE_02;
 			}
 
 			break;
 
 		case ST_SYS_ACTIVE_02:
 
+			if ((true == p_task_system_dta->flag) && (0 == p_task_system_dta->tick))
+			{
+				p_task_system_dta->state = ST_SYS_ACTIVE_03;
+				p_task_system_dta->flag = false;
+				put_event_task_actuator(EV_LED_XX_ON, ID_LED_A);
+			}
+			else if ((true == p_task_system_dta->flag) && (0 < p_task_system_dta->tick))
+			{
+				p_task_system_dta->tick--;
+				p_task_system_dta->flag = false;
+			}
+
 			break;
 
 		case ST_SYS_ACTIVE_03:
 
+			if ((true == p_task_system_dta->flag) && (EV_SYS_NOT_LOOP_DET == p_task_system_dta->event))
+			{
+				p_task_system_dta->flag = false;
+				p_task_system_dta->state = ST_SYS_ACTIVE_04;
+			}
+
 			break;
 
 		case ST_SYS_ACTIVE_04:
+			if ((true == p_task_system_dta->flag) && (EV_SYS_IR_PHO_CELL == p_task_system_dta->event))
+			{
+				p_task_system_dta->flag = false;
+				p_task_system_dta->state = ST_SYS_ACTIVE_05;
+			}
 
 			break;
 
 		case ST_SYS_ACTIVE_05:
+			if ((true == p_task_system_dta->flag) && (EV_SYS_IR_NOT_PHO_CELL == p_task_system_dta->event))
+			{
+				p_task_system_dta->flag = false;
+				p_task_system_dta->state = ST_SYS_ACTIVE_06;
+				p_task_system_dta->tick = DEL_SYS_MAX;
+				put_event_task_actuator(EV_LED_XX_ON, ID_LED_A);
+			}
+
 
 			break;
 
 		case ST_SYS_ACTIVE_06:
+
+			if ((true == p_task_system_dta->flag) && (0 == p_task_system_dta->tick))
+			{
+				p_task_system_dta->state = ST_SYS_IDLE;
+				p_task_system_dta->flag = false;
+				put_event_task_actuator(EV_LED_XX_ON, ID_LED_A);
+			}
+			else if ((true == p_task_system_dta->flag) && (0 < p_task_system_dta->tick))
+			{
+				p_task_system_dta->tick--;
+				p_task_system_dta->flag = false;
+			}
+
 
 			break;
 
